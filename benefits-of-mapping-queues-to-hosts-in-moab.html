@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>"Benefits of Mapping Queues to Hosts in Moab"</title>
+  <meta name="author" content="Matthew Britt">
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="/favicon.png" rel="icon">
+  <link href="/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+  <script src="/theme/js/modernizr-2.0.js"></script>
+  <script src="/theme/js/ender.js"></script>
+  <script src="/theme/js/octopress.js" type="text/javascript"></script>
+
+  <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="/">Screwing Up At Scale</a></h1>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+</ul>
+
+
+
+<ul class="main-navigation">
+      <li><a href="/pages/about-me.html">About Me</a></li>
+    <li class="active">
+    <a href="/category/computing.html">Computing</a>
+    </li>
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">"Benefits of Mapping Queues to Hosts in Moab"</h1>
+      <p class="meta"><time datetime="2013-07-23T00:00:00" pubdate>Tue 23 July 2013</time></p>
+</header>
+
+  <div class="entry-content"><p>The primary cluster we run uses the <a href="http://www.adaptivecomputing.com/products/hpc-products/moab-hpc-suite-enterprise-edition/">Moab HPC suite from Adaptive Computing </a> .  One of our continuing goals is make our documentation and tools sufficiently good so our users can help themselves.  One of the Moab tools we frequently recommend to our users gives us incorrect and confusing information.  Inquries to support gave us no additional insight, but turns out, the solution was easy and elegant.</p>
+<h2>Clarity Is A Good Thing</h2>
+<p><code>checknode</code> is a fantastic tool in the Moab suite, allowing you to see the physical resources configured, in use, and available to new tasks.   </p>
+<div class="highlight"><pre><span class="p">[</span><span class="n">msbritt</span><span class="err">@</span><span class="n">nyx</span> <span class="o">~</span><span class="p">]</span><span class="err">$</span> <span class="n">checknode</span> <span class="n">nyx7000</span>
+<span class="n">node</span> <span class="n">nyx7000</span>
+
+<span class="nl">State:</span>      <span class="n">Idle</span>  <span class="p">(</span><span class="n">in</span> <span class="n">current</span> <span class="n">state</span> <span class="k">for</span> <span class="mi">2</span><span class="o">:</span><span class="mi">15</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">37</span><span class="p">)</span>
+<span class="n">Configured</span> <span class="n">Resources</span><span class="o">:</span> <span class="n">PROCS</span><span class="o">:</span> <span class="mi">40</span>  <span class="n">MEM</span><span class="o">:</span> <span class="mi">1009</span><span class="n">G</span>  <span class="n">SWAP</span><span class="o">:</span> <span class="mi">1021</span><span class="n">G</span>  <span class="n">DISK</span><span class="o">:</span> <span class="mi">24</span><span class="n">G</span>
+<span class="n">Utilized</span>   <span class="n">Resources</span><span class="o">:</span> <span class="n">SWAP</span><span class="o">:</span> <span class="mi">9546</span><span class="n">M</span>  <span class="n">DISK</span><span class="o">:</span> <span class="mi">247</span><span class="n">M</span>
+<span class="n">Dedicated</span>  <span class="n">Resources</span><span class="o">:</span> <span class="o">---</span>
+<span class="n">Charge</span> <span class="n">Rate</span><span class="o">:</span>        <span class="mf">1.00</span>
+<span class="n">MTBF</span><span class="p">(</span><span class="n">longterm</span><span class="p">)</span><span class="o">:</span>   <span class="n">INFINITY</span>  <span class="n">MTBF</span><span class="p">(</span><span class="mi">24</span><span class="n">h</span><span class="p">)</span><span class="o">:</span>   <span class="n">INFINITY</span>
+<span class="nl">Opsys:</span>      <span class="n">linux</span>     <span class="n">Arch</span><span class="o">:</span>      <span class="o">---</span>
+<span class="nl">Speed:</span>      <span class="mf">1.00</span>      <span class="n">CPULoad</span><span class="o">:</span>   <span class="mf">0.120</span> <span class="p">(</span><span class="n">ProcSpeed</span><span class="o">:</span> <span class="mi">2270</span><span class="p">)</span>
+<span class="nl">Features:</span>   <span class="n">nehalem</span><span class="p">,</span><span class="n">ib</span><span class="p">,</span><span class="n">mdc1</span><span class="p">,</span><span class="n">flux</span><span class="p">,</span><span class="n">fluxm</span><span class="p">,</span><span class="n">r910</span><span class="p">,</span><span class="n">x4860</span>
+<span class="nl">Classes:</span>    <span class="p">[</span><span class="n">cac</span><span class="p">][</span><span class="n">flux</span><span class="p">][</span><span class="n">fluxm</span><span class="p">][</span><span class="n">fluxod</span><span class="p">]</span>
+</pre></div>
+
+
+<p>One of the most misleading sections of the output was Classes section.  We segregate our nodes for different policies primarily via <a href="http://docs.adaptivecomputing.com/mwm/help.htm#topics/resourceAccess/standingreservations.html">standing reservations</a> and <a href="http://docs.adaptivecomputing.com/mwm/help.htm#topics/resourceAccess/partitions.html">partitions</a>, which have served us well.   By using these policies, there is no mechanism that all of those Classes could reach each node, although most users wouldn't understand what all of those policies were.  A better example of this might be via <code>mdiag</code>, which would be a command a user might use to look at the overall cluster (I'll select just a few examples):</p>
+<div class="highlight"><pre><span class="n">Name</span>    <span class="n">State</span>   <span class="n">Procs</span>   <span class="n">Memory</span>  <span class="n">Disk</span>    <span class="n">Par</span>     <span class="n">Classes</span>
+<span class="n">nyx1000</span> <span class="n">Busy</span>    <span class="mi">0</span><span class="o">:</span><span class="mi">16</span>    <span class="mi">1987</span><span class="o">:</span><span class="mi">64387</span>      <span class="mi">98221</span><span class="o">:</span><span class="mi">98429</span>     <span class="n">nyx</span>     <span class="p">[</span><span class="n">cac</span><span class="p">][</span><span class="n">flux</span><span class="p">][</span><span class="n">fluxm</span><span class="p">][</span><span class="n">fluxod</span><span class="p">]</span> 
+<span class="n">nyx4000</span> <span class="n">Idle</span>    <span class="mi">12</span><span class="o">:</span><span class="mi">12</span>   <span class="mi">48258</span><span class="o">:</span><span class="mi">48258</span>     <span class="mi">24435</span><span class="o">:</span><span class="mi">24607</span>     <span class="n">nyx</span>     <span class="p">[</span><span class="n">cac</span><span class="p">][</span><span class="n">flux</span><span class="p">][</span><span class="n">fluxm</span><span class="p">][</span><span class="n">fluxod</span><span class="p">]</span> 
+<span class="n">nyx5000</span> <span class="n">Idle</span>    <span class="mi">8</span><span class="o">:</span><span class="mi">8</span>     <span class="mi">48258</span><span class="o">:</span><span class="mi">48258</span>     <span class="mi">24432</span><span class="o">:</span><span class="mi">24607</span>     <span class="n">flu</span>    <span class="p">[</span><span class="n">cac</span><span class="p">][</span><span class="n">flux</span><span class="p">][</span><span class="n">fluxm</span><span class="p">][</span><span class="n">fluxod</span><span class="p">]</span> 
+<span class="n">nyx7000</span> <span class="n">Running</span> <span class="mi">2</span><span class="o">:</span><span class="mi">40</span>    <span class="mi">309385</span><span class="o">:</span><span class="mi">1033945</span>  <span class="mi">24114</span><span class="o">:</span><span class="mi">24607</span>     <span class="n">flu</span>     <span class="p">[</span><span class="n">cac</span><span class="p">][</span><span class="n">flux</span><span class="p">][</span><span class="n">fluxm</span><span class="p">][</span><span class="n">fluxod</span><span class="p">]</span>
+</pre></div>
+
+
+<p>The solution, as I discovered, was both easy and obvious (aren't they all after you know them....).  Moab won't "overthink" the process policies and what jobs could land there; it is only reporting what is defined, which means the bindings must occur in either <code>NODECFG</code> or <code>CLASSCFG</code>.   The only available option is under <code>CLASSCFG</code>, using the attribute <code>HOSTLIST</code>.   <code>HOSTLIST</code> can be a "Host expression, or comma-delimited list of hosts or host ranges." </p>
+<div class="highlight"><pre> <span class="n">CLASSCFG</span><span class="p">[</span><span class="n">test1</span><span class="p">]</span> <span class="n">HOSTLIST</span><span class="o">=</span><span class="n">node1</span><span class="p">,</span><span class="n">node2</span><span class="p">,</span><span class="n">node3</span>   <span class="err">#</span> <span class="n">explicitly</span> <span class="n">identify</span> <span class="n">nodes</span>
+ <span class="n">CLASSCFG</span><span class="p">[</span><span class="n">test2</span><span class="p">]</span> <span class="n">HOSTLIST</span><span class="o">=</span><span class="n">r</span><span class="o">:</span><span class="n">node</span><span class="p">[</span><span class="mi">4</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>  <span class="err">#</span><span class="n">uses</span> <span class="n">node</span> <span class="n">ranges</span><span class="o">:</span> <span class="n">node4</span><span class="p">,</span> <span class="n">node5</span><span class="p">,</span> <span class="n">and</span> <span class="n">node6</span>   
+ <span class="n">CLASSCFG</span><span class="p">[</span><span class="n">test3</span><span class="p">]</span> <span class="n">HOSTLIST</span><span class="o">=</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span>   <span class="err">#</span><span class="n">use</span> <span class="n">node</span> <span class="n">regex</span><span class="o">:</span>  <span class="n">nodes</span> <span class="n">node10</span> <span class="n">through</span> <span class="n">node29</span>
+</pre></div>
+
+
+<p>Because we define large blocks of node ranges for each portion of the cluster, using the last example makes it really easy for us to define which hosts bind to which classes.   Now, <code>checknode</code> becomes more accurate (note the single class listed at the end):</p>
+<div class="highlight"><pre><span class="p">[</span><span class="n">msbritt</span><span class="err">@</span><span class="n">nyx</span> <span class="o">~</span><span class="p">]</span><span class="err">$</span> <span class="n">checknode</span> <span class="n">nyx7000</span>
+<span class="n">node</span> <span class="n">nyx7000</span>
+
+<span class="nl">State:</span>      <span class="n">Idle</span>  <span class="p">(</span><span class="n">in</span> <span class="n">current</span> <span class="n">state</span> <span class="k">for</span> <span class="mi">2</span><span class="o">:</span><span class="mi">15</span><span class="o">:</span><span class="mi">56</span><span class="o">:</span><span class="mi">37</span><span class="p">)</span>
+<span class="n">Configured</span> <span class="n">Resources</span><span class="o">:</span> <span class="n">PROCS</span><span class="o">:</span> <span class="mi">40</span>  <span class="n">MEM</span><span class="o">:</span> <span class="mi">1009</span><span class="n">G</span>  <span class="n">SWAP</span><span class="o">:</span> <span class="mi">1021</span><span class="n">G</span>  <span class="n">DISK</span><span class="o">:</span> <span class="mi">24</span><span class="n">G</span>
+<span class="n">Utilized</span>   <span class="n">Resources</span><span class="o">:</span> <span class="n">SWAP</span><span class="o">:</span> <span class="mi">9546</span><span class="n">M</span>  <span class="n">DISK</span><span class="o">:</span> <span class="mi">247</span><span class="n">M</span>
+<span class="n">Dedicated</span>  <span class="n">Resources</span><span class="o">:</span> <span class="o">---</span>
+<span class="n">Charge</span> <span class="n">Rate</span><span class="o">:</span>        <span class="mf">1.00</span>
+<span class="n">MTBF</span><span class="p">(</span><span class="n">longterm</span><span class="p">)</span><span class="o">:</span>   <span class="n">INFINITY</span>  <span class="n">MTBF</span><span class="p">(</span><span class="mi">24</span><span class="n">h</span><span class="p">)</span><span class="o">:</span>   <span class="n">INFINITY</span>
+<span class="nl">Opsys:</span>      <span class="n">linux</span>     <span class="n">Arch</span><span class="o">:</span>      <span class="o">---</span>
+<span class="nl">Speed:</span>      <span class="mf">1.00</span>      <span class="n">CPULoad</span><span class="o">:</span>   <span class="mf">0.120</span> <span class="p">(</span><span class="n">ProcSpeed</span><span class="o">:</span> <span class="mi">2270</span><span class="p">)</span>
+<span class="nl">Features:</span>   <span class="n">nehalem</span><span class="p">,</span><span class="n">ib</span><span class="p">,</span><span class="n">mdc1</span><span class="p">,</span><span class="n">flux</span><span class="p">,</span><span class="n">fluxm</span><span class="p">,</span><span class="n">r910</span><span class="p">,</span><span class="n">x4860</span>
+<span class="nl">Classes:</span>    <span class="p">[</span><span class="n">fluxm</span><span class="p">]</span>
+</pre></div>
+
+
+<p><code>mdiag</code> might show it even more clearly:</p>
+<div class="highlight"><pre><span class="n">Name</span>    <span class="n">State</span>   <span class="n">Procs</span>   <span class="n">Memory</span>  <span class="n">Disk</span>    <span class="n">Par</span>     <span class="n">Classes</span>
+<span class="n">nyx1000</span> <span class="n">Busy</span>    <span class="mi">0</span><span class="o">:</span><span class="mi">16</span>    <span class="mi">1987</span><span class="o">:</span><span class="mi">64387</span>      <span class="mi">98221</span><span class="o">:</span><span class="mi">98429</span>     <span class="n">nyx</span>     <span class="p">[</span><span class="n">cac</span><span class="p">]</span>
+<span class="n">nyx4000</span> <span class="n">Idle</span>    <span class="mi">12</span><span class="o">:</span><span class="mi">12</span>   <span class="mi">48258</span><span class="o">:</span><span class="mi">48258</span>     <span class="mi">24435</span><span class="o">:</span><span class="mi">24607</span>     <span class="n">nyx</span>     <span class="p">[</span><span class="n">cac</span><span class="p">]</span>
+<span class="n">nyx5000</span> <span class="n">Idle</span>    <span class="mi">8</span><span class="o">:</span><span class="mi">8</span>     <span class="mi">48258</span><span class="o">:</span><span class="mi">48258</span>     <span class="mi">24432</span><span class="o">:</span><span class="mi">24607</span>     <span class="n">flu</span>     <span class="p">[</span><span class="n">flux</span><span class="p">][</span><span class="n">fluxod</span><span class="p">]</span>
+<span class="n">nyx7000</span> <span class="n">Running</span> <span class="mi">2</span><span class="o">:</span><span class="mi">40</span>    <span class="mi">309385</span><span class="o">:</span><span class="mi">1033945</span>  <span class="mi">24114</span><span class="o">:</span><span class="mi">24607</span>     <span class="n">flu</span>     <span class="p">[</span><span class="n">fluxm</span><span class="p">]</span>
+</pre></div>
+
+
+<p>It turned out to be a simple solution but one that makes the utility of the diagnostics tools that much better, so we'll call it a win.</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Matthew Britt</span>
+  </span>
+<time datetime="2013-07-23T00:00:00" pubdate>Tue 23 July 2013</time>  <span class="categories">
+    <a class="category" href="/tag/hpc.html">HPC</a>
+    <a class="category" href="/tag/moab.html">Moab</a>
+    <a class="category" href="/tag/torque.html">Torque</a>
+  </span>
+</p><div class="sharing">
+</div>    </footer>
+  </article>
+
+</div>
+<aside class="sidebar">
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="/benefits-of-mapping-queues-to-hosts-in-moab.html">"Benefits of Mapping Queues to Hosts in Moab"</a>
+      </li>
+      <li class="post">
+          <a href="/playing-with-jekyll.html">"Playing With Jekyll"</a>
+      </li>
+      <li class="post">
+          <a href="/"Test".html">"Using TextExpander For HPC"</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+      
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="/category/computing.html">Computing</a></li>
+    </ul>
+  </section>
+ 
+
+  <section>
+  <h1>Tags</h1>
+    <a href="/tag/hpc.html">HPC</a>,    <a href="/tag/textexpander.html">Textexpander</a>,    <a href="/tag/torque.html">Torque</a>,    <a href="/tag/moab.html">Moab</a>,    <a href="/tag/blogging-jekyll.html">Blogging Jekyll</a>  </section>
+
+
+
+  <section>
+    <h1>GitHub Repos</h1>
+    <ul id="gh_repos">
+      <li class="loading">Status updating...</li>
+    </ul>
+      <a href="https://github.com/msbritt">@msbritt</a> on GitHub
+    <script type="text/javascript">
+      $.domReady(function(){
+          if (!window.jXHR){
+              var jxhr = document.createElement('script');
+              jxhr.type = 'text/javascript';
+              jxhr.src = '/theme/js/jXHR.js';
+              var s = document.getElementsByTagName('script')[0];
+              s.parentNode.insertBefore(jxhr, s);
+          }
+
+          github.showRepos({
+              user: 'msbritt',
+              count: 5,
+              skip_forks: false,
+              target: '#gh_repos'
+          });
+      });
+    </script>
+    <script src="/theme/js/github.js" type="text/javascript"> </script>
+  </section>
+
+    <section>
+        <h1>Social</h1>
+        <ul>
+            <li><a href="#" target="_blank">You can add links in your config file</a></li>
+            <li><a href="#" target="_blank">Another social link</a></li>
+        </ul>
+    </section>
+    <section>
+        <h1>Blogroll</h1>
+        <ul>
+            <li><a href="http://brettterpstra.com" target="_blank">Brett Terpstra</a></li>
+            <li><a href="http://daringfireball.net" target="_blank">Daring Fireball</a></li>
+            <li><a href="http://www.elasticsearch.org/blog/" target="_blank">Elasticsearch</a></li>
+        </ul>
+    </section>
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      var widgetId = '456647399247577089',
+          domId = 'tweets',
+          count = 5,
+          hyperlinkUrlsPlus = true,
+          showUserPhoto = false,
+          timeOfTweet = true,
+          dateFormat = 'default',
+          showRetweets = false,
+          customOutputFn = null,
+          showReplyRetweetButtons = false;
+
+      twitterFetcher.fetch(
+        widgetId,
+        domId,
+        count,
+        hyperlinkUrlsPlus,
+        showUserPhoto,
+        timeOfTweet,
+        dateFormat,
+        showRetweets,
+        customOutputFn,
+        showReplyRetweetButtons
+      );
+    });
+  </script>
+  <script src="/theme/js/twitter.js" type="text/javascript"> </script>
+    <p>Follow <a href="http://twitter.com/matthewbritt">@matthewbritt</a></p>
+</section>
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+      Copyright &copy; 2014 - Matthew Britt -
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+</body>
+</html>
