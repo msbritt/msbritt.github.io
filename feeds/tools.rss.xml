@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Screwing Up At Scale</title><link>http://msbritt.github.io/</link><description></description><atom:link href="None/feeds/tools.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 22 Apr 2014 00:00:00 -0400</lastBuildDate><item><title>"Using nvALT with GitHub Wikis"</title><link>http://msbritt.github.io/blog/2014/04/22/using-nvalt-with-github-wikis/</link><description>&lt;p&gt;&lt;a href="http://cac.engin.umich.edu/"&gt;We&lt;/a&gt; converted from &lt;a href="http://moinmo.in/"&gt;MoinMoin&lt;/a&gt; to using GitHub's project wiki for internal documentation.   There were a few reasons but we had some distinct advantages in making the transition.  The first advantage is, rather than hosting our own wiki,  we get to leverage a cloud-based wiki along side of our GitHub-based project repos (some of which are mostly documentation).  Secondly, we can leave behind the MoinMoin syntax and use &lt;a href="https://daringfireball.net/projects/markdown/"&gt;Markdown&lt;/a&gt; (hurray!). Lastly, and probably my favorite, was that our wiki is now a git repo, which means I can have a local copy with all the power of git.  Brilliant!&lt;/p&gt;
+&lt;p&gt;The only downside was searching for content.  The repo is a collection of text and Markdown files.  In our case, &lt;strong&gt;lots&lt;/strong&gt; of Markdown files.   Using &lt;code&gt;grep&lt;/code&gt; to search for content (especially for common terms) is completely ineffective.   For personal documentation (meeting notes, software build instructions, etc.), I currently use the fantastic tool &lt;a href="http://brettterpstra.com/projects/nvalt/"&gt;nvALT&lt;/a&gt;, which let's you very quickly search your notes and assuming you don't find what you were searching for, create new ones.  With Markdown previews and Marked.app support, it turns out to be a remarkably useful tool for indexing lots of Markdown files.  However, I'm already using nvALT for my own personal notes, it doesn't natively support multiple setups of documentation, and I don't want to forgo all my documentation just for our work wiki.   What to do, what to do....  Unsuprisingly, someone figured it out already.&lt;/p&gt;
+&lt;h2&gt;Creating your local GitHub wiki&lt;/h2&gt;
+&lt;p&gt;I assume you already have your wiki in GitHub; if not, take a look at some documentation on creating a &lt;a href="https://github.com/blog/699-making-github-more-open-git-backed-wikis"&gt;GitHub wiki&lt;/a&gt;.  Making your local repo of your version is easy:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="nx"&gt;git&lt;/span&gt; &lt;span class="nx"&gt;clone&lt;/span&gt; &lt;span class="nx"&gt;git&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;github.com&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;groupname&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;/&lt;/span&gt;&lt;span class="nx"&gt;hpc&lt;/span&gt;&lt;span class="na"&gt;-projects.wiki.git&lt;/span&gt;  &lt;span class="err"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;your&lt;/span&gt; &lt;span class="nx"&gt;preferred&lt;/span&gt; &lt;span class="nx"&gt;directory&lt;/span&gt; &lt;span class="nb"&gt;name&lt;/span&gt;&lt;span class="cp"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I prefer using Dropbox, so no matter if I'm at work, home, or on the road, my local repo will be consistent.  If you &lt;code&gt;cd&lt;/code&gt; into the directory, you can verify the remote settings with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="err"&gt;⇒&lt;/span&gt;  &lt;span class="nx"&gt;git&lt;/span&gt; &lt;span class="nx"&gt;remote&lt;/span&gt; &lt;span class="na"&gt;-v&lt;/span&gt;
+    &lt;span class="nx"&gt;origin&lt;/span&gt;  &lt;span class="nx"&gt;git&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;github.com&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;groupname&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;/&lt;/span&gt;&lt;span class="nx"&gt;hpc&lt;/span&gt;&lt;span class="na"&gt;-projects.wiki.git&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;fetch&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nx"&gt;origin&lt;/span&gt;  &lt;span class="nx"&gt;git&lt;/span&gt;&lt;span class="p"&gt;@&lt;/span&gt;&lt;span class="nx"&gt;github.com&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;groupname&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;/&lt;/span&gt;&lt;span class="nx"&gt;hpc&lt;/span&gt;&lt;span class="na"&gt;-projects.wiki.git&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;push&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now you should have your directory of text and (hopefully) Markdown files.  Now to configure nvALT to use the new repo.&lt;/p&gt;
+&lt;h2&gt;Configuring nvALT&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://compileyouidontevenknowyou.blogspot.com/2011/10/running-two-notational-velocities-at.html"&gt;Dan Rosenstark&lt;/a&gt; figured out how to run two versions at the same time by creating unique &lt;code&gt;CFBundleIdentifier&lt;/code&gt; values.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="n"&gt;cd&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Applications&lt;/span&gt;
+    &lt;span class="n"&gt;cp&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;nvALT&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="n"&gt;githubwiki&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;or&lt;/span&gt; &lt;span class="n"&gt;whatever&lt;/span&gt; &lt;span class="n"&gt;your&lt;/span&gt; &lt;span class="n"&gt;preferred&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="n"&gt;is&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;cd&lt;/span&gt; &lt;span class="n"&gt;githubwiki&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;
+    &lt;span class="n"&gt;vim&lt;/span&gt; &lt;span class="n"&gt;Contents&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Info&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;plist&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You need to modify the &lt;code&gt;CFBundleIdentifier&lt;/code&gt; key to a unique value.   The original:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;CFBundleIdentifier&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;string&amp;gt;&lt;/span&gt;net.elasticthreads.nv&lt;span class="nt"&gt;&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Modified for your GitHub wiki version (I appended a 2 to the string):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;CFBundleIdentifier&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;string&amp;gt;&lt;/span&gt;net.elasticthreads.nv2&lt;span class="nt"&gt;&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I also like to have the name of the application change so it is obvious which is active (my notes or the GitHub Wiki).  After a little more research and digging, I discovered you can modify to local English plist settings to change the display name:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="n"&gt;vim&lt;/span&gt; &lt;span class="n"&gt;Contents&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Resources&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;English&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lproj&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;InfoPlist&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strings&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Modify the line below to change the name:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;    &lt;span class="n"&gt;CFBundleName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;nvALT&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;to&lt;/span&gt;
+    &lt;span class="n"&gt;CFBundleName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;GitHub Wiki&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Your new "application" is installed; use your favorite launcher to start &lt;code&gt;githubwiki&lt;/code&gt;.  In the app, open Preferences.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Under&lt;/span&gt; &lt;span class="n"&gt;Preferences&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Notes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;set&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Read notes from folder:&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;your&lt;/span&gt; &lt;span class="n"&gt;newly&lt;/span&gt; &lt;span class="n"&gt;created&lt;/span&gt; &lt;span class="n"&gt;wiki&lt;/span&gt; &lt;span class="n"&gt;folder&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Under&lt;/span&gt; &lt;span class="n"&gt;Preferences&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Notes&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Storage&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;set&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Store and read notes on disk as: Plain Text Files&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Under&lt;/span&gt; &lt;span class="n"&gt;Preferences&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Notes&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Storage&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;add&lt;/span&gt; &lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;md&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;the&lt;/span&gt; &lt;span class="n"&gt;extension&lt;/span&gt; &lt;span class="n"&gt;list&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;include&lt;/span&gt; &lt;span class="n"&gt;Markdown&lt;/span&gt; &lt;span class="n"&gt;files&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Remember, nvALT is editing your local files.   You'll need to push your repo back to GitHub to incorporate any changes into your master on GitHub.&lt;/p&gt;
+&lt;p&gt;That's it - you now have a wickedly fast search of your local GitHub wiki as well an easy way to create to new entries.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Matthew Britt</dc:creator><pubDate>Tue, 22 Apr 2014 00:00:00 -0400</pubDate><guid>tag:msbritt.github.io,2014-04-22:blog/2014/04/22/using-nvalt-with-github-wikis/</guid><category>github</category><category>nvalt</category></item><item><title>"Playing With Jekyll"</title><link>http://msbritt.github.io/blog/2013/06/06/playing-with-jekyll/</link><description>&lt;p&gt;If you decide to start blogging with &lt;a href="http://jekyllbootstrap.com/"&gt;Jekyll-Bootstrap&lt;/a&gt;, your initial workflow might be write, push to github, and load the page in your web browser of choice.  As I was learning how it worked, this became quite tedious (learning by pushing might not be the most efficient method....).  As I did,  you might find it easier to preview your posts with a local instance of Jekyll, rather than writing/pushing/reloading.  Turns out, it is quite easy.&lt;/p&gt;
+&lt;h2&gt;Getting Started with Jekyll&lt;/h2&gt;
+&lt;p&gt;There are several good sites on getting started with blogging on github, but here is a &lt;a href="http://acaird.github.io/computers/2013/05/24/blogging-with-org-and-git/"&gt;good post &lt;/a&gt; (&lt;strong&gt;go down the rabbit hole of org-mode at your risk&lt;/strong&gt;).  To summarize how to make your first blogpost:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Clone the jekyll bootstrap repo into a directory of you choice.  I'm using Dropbox, so I can edit posts on any of my machines or iOS devices&lt;/li&gt;
+&lt;li&gt;Update the repo to use your github account and update the config file ( &lt;code&gt;_config.yml&lt;/code&gt; ) with your personal information&lt;/li&gt;
+&lt;li&gt;Create a new blog post:&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;rake&lt;/span&gt; &lt;span class="n"&gt;post&lt;/span&gt; &lt;span class="n"&gt;title&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;your title&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Fire up vim or your favorite markdown editor and write the world's greatest blogpost&lt;/li&gt;
+&lt;li&gt;Push the repo to github&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Voila!  You're published!&lt;/p&gt;
+&lt;h2&gt;Testing Makes Perfect&lt;/h2&gt;
+&lt;p&gt;So, as I stated earlier, you can write/commit/push/reload until your heart's content.  As you edit, play with themes, or otherwise tinker with your site, you'll find this process tiresome.  Installing your own version of Jekyll will save you lots of time.   If you're running on OSX, installing a local copy of jekyll is very easy. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Install &lt;a href="http://mxcl.github.io/homebrew/"&gt;Homebrew&lt;/a&gt;  &lt;/li&gt;
+&lt;li&gt;Install Ruby from Homebrew&lt;/li&gt;
+&lt;li&gt;Use gem from Ruby to install Jekyll&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"&lt;/code&gt; &lt;br /&gt;
+brew install ruby &lt;br /&gt;
+gem install jekyll &lt;sup id="fnref:1"&gt;&lt;a class="footnote-ref" href="#fn:1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt;   &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Now that jekyll is installed, you'll have to find the location ( I used the default location of /usr/local for homebrew, so my gem was installed under &lt;code&gt;/usr/local/Cellar/...&lt;/code&gt; ).  I couldn't get use the brew-gem installation of jekyll to work properly, which would symlink the binaries to somewhere in your path.  Your path may be slightly different, but you'll start Jekyll in server mode in the directory of your cloned jekyll repo (from step 1 above):&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[msbritt@ghost]$ cd ~/Dropbox/repos/msbritt.github.io &lt;br /&gt;
+   [msbritt@ghost]$ /usr/local/Cellar/ruby/2.0.0-p195/bin/jekyll serve   &lt;/p&gt;
+&lt;p&gt;Configuration file: /Users/msbritt/Dropbox/repos/msbritt.github.io/_config.yml &lt;br /&gt;
+          Deprecation: Auto-regeneration can no longer be set from your configuration file(s). Use the --watch/-w command-line option instead. &lt;br /&gt;
+               Source: /Users/msbritt/Dropbox/repos/msbritt.github.io &lt;br /&gt;
+          Destination: /Users/msbritt/Dropbox/repos/msbritt.github.io/_site &lt;br /&gt;
+          Generating... done. &lt;br /&gt;
+   [2013-06-07 11:13:58] INFO  WEBrick 1.3.1 &lt;br /&gt;
+   [2013-06-07 11:13:58] INFO  ruby 2.0.0 (2013-05-14) [x86_64-darwin12.3.0] &lt;br /&gt;
+   [2013-06-07 11:13:58] INFO  WEBrick::HTTPServer#start: pid=57799 port=4000   &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Point your browser to localhost:4000 and voila, a local replica of your site.   You can now experiement with settings, themes, and of course content, before pushing your content up for public consumption.  Pretty cool!&lt;/p&gt;
+&lt;div class="footnote"&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id="fn:1"&gt;
+&lt;p&gt;Using the Homebrew version of gem doesn't require any extended priviledges via sudo or root.&amp;#160;&lt;a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Matthew Britt</dc:creator><pubDate>Thu, 06 Jun 2013 00:00:00 -0400</pubDate><guid>tag:msbritt.github.io,2013-06-06:blog/2013/06/06/playing-with-jekyll/</guid><category>Blogging</category></item><item><title>"Using TextExpander For HPC"</title><link>http://msbritt.github.io/blog/2013/05/30/using-textexpander-for-hpc/</link><description>&lt;p&gt;Whether you're providing user-support via email or tracking down problems as a systems administrator on your cluster, there is no shortage of tasks to complete in a day.  One of the most valuable tools I use for both of these roles is &lt;a href="http://smilesoftware.com/TextExpander/index.html"&gt;TextExpander&lt;/a&gt;  from &lt;a href="http://smilesoftware.com"&gt;Smile&lt;/a&gt; for OSX and iOS.  If you're not familiar with TextExpander, it allows you to type some user-defined characters (called a snippet) which get expanded to whatever you need.   These could be simple things like email signatures appropriate to the recipient, common responses to questions, or more cluster-related functions.    &lt;/p&gt;
+&lt;p&gt;As an example, I frequently want to look at the user-specified credentials for a job (I'll discuss the clipboard later):&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;,,epc&lt;/code&gt;   (for me, short for ""expand PBS credentials"")&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;gets expanded to   &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;qstat -f  %clipboard  | egrep -i '(Account_Name|qos|queue|euser) ='&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This can be useful for anyone, but when you add the ability to do date math, drop downs and fill-ins, and scripting ability, TextExpander may become your most useful tool for getting work done.&lt;/p&gt;
+&lt;h2&gt;Examples&lt;/h2&gt;
+&lt;h3&gt;Basic Expansion&lt;/h3&gt;
+&lt;p&gt;Many common email responses can be quickly provided using TextExpander.   Using TextExpander is not only faster, but has many additional advantages:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Eliminate spelling and grammar errors in response (esp. if you're prone to the quick email dashed response)&lt;/li&gt;
+&lt;li&gt;Provide long solutions to commonly asked questions with a couple keystrokes&lt;/li&gt;
+&lt;li&gt;Can use particular wording that you and your group may chose to use to answer specific types of questions (answers that may have be particularly nuanced)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;TextExpander makes it easy to take something you or one of your colleagues has written and turn it into a snippet.  Answer the same question twice and you're a little faster.  Answer the same question 50 times and you're crazy not to be using TextExpander.    &lt;/p&gt;
+&lt;p&gt;Some examples I use frequently:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;URLs to documentation&lt;/li&gt;
+&lt;li&gt;Descriptions of different products we offer (some which have several paragraphs)&lt;/li&gt;
+&lt;li&gt;Warnings to users (disk quotas, system utilization, bad behavior)&lt;/li&gt;
+&lt;li&gt;Outage descriptions&lt;/li&gt;
+&lt;li&gt;Spell-correction.  Smile has an importable snippet library using tons of commonly misspelled words.   Your word-processor may already do this, but TextExpander can process this anywhere you type text.  Powerful.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Using The Clipboard&lt;/h3&gt;
+&lt;p&gt;TextExpander can read from the OSX clipboard, which allows you to make some dynamic expansions.  Frequently users will email you with a problem or request involving a PBS job id.   With a job id and TextExpander, I can:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Look at the job's PBS credentials, where I get the user name, account, qos, and class being requested.&lt;/li&gt;
+&lt;li&gt;On a compute host, can find any related job files&lt;/li&gt;
+&lt;li&gt;If the files hadn't been cleaned up properly, can remove them&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Other times, we have specific issues with hosts, either from user reports, logging tools, or observing behavior.  With the hostname in the clipboard, we can:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Can create specifically named reservations to isolate a badly-behaving compute node&lt;/li&gt;
+&lt;li&gt;Show all of the jobs running on a specific host&lt;/li&gt;
+&lt;li&gt;Use IPMI to see power status or turn a host on or off&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Turning operations that you do daily into snippets makes you faster and less error prone.  For operations that you don't do as frequently and may not the command syntax, using TextExpander to run the command correctly the first time rather than running to a manpage or to Google makes you &lt;strong&gt;much&lt;/strong&gt; faster.&lt;/p&gt;
+&lt;h3&gt;Date Math&lt;/h3&gt;
+&lt;p&gt;TextExpander has the ability to do "date math", allowing you to make snippets based on dates.  As an admin, you probably live in your logs, and if you're a cluster admin, you probably have a &lt;strong&gt;ton&lt;/strong&gt; of logs.  We use the Adaptive Computing stack, including Torque, Moab, and the Moab Accounting Manager (MAM), but these concepts should translate to whatever resource manager stack you're using.   And if you are using the Adaptive Computing stack, you know they don't using the same date strings in their logs, so having the correct date format expanded makes sure you find what you're looking for.   Like the unix date command, you can specify the format of the date as appropriate and TextExpander lets you add or remove time, making inquiries like 'yesterday' and 'since last week' trivial.&lt;/p&gt;
+&lt;p&gt;Some date math examples:
+&lt;em&gt; Run less on yesterday's pbs_mom logs (I have a snippet called &lt;code&gt;pdate&lt;/code&gt; for PBS date formats: 20130529 )
+&lt;/em&gt; Run less on Moab logs from one week ago
+&lt;em&gt; Look for specific job entries from yesterday server logs
+&lt;/em&gt; Create allocations in MAM starting tomorrow  (I have another snippet called &lt;code&gt;gdate&lt;/code&gt; for Gold/MAM formatsL 2013-05-29 )&lt;/p&gt;
+&lt;h3&gt;Scriptability&lt;/h3&gt;
+&lt;p&gt;Probably the most powerful feature of TextExpander is the ability to scriptability.  You can create Applescripts or bash scripts, which means you can use your favorite scripting language, from perl to python to ruby, which full access to the clipboard, date math, and the rest of TextExpander's feature set.&lt;/p&gt;
+&lt;p&gt;Some examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We receive via email requests to create new cluster allocations, which we need to look over before creating them.   What used to take 5-10 minutes to read, process, email financial people, and acknowledge the user is handled quite trivially.  We copy the portion of the email with the details of the allocation.  By expanding a snippet, we call a perl script which parses the email and formats it into a command line which can create the account or allocation.  We have snippets to acknowledge the user, using details from the created allocation.  We can send reports to our financial people using common subject lines and formats, so they can get predictable emails from us.   Faster, predictable and error-free.   What's not to love?&lt;/li&gt;
+&lt;li&gt;I frequently have to handle lists of hosts (comma-delimited for Torque and Moab) - with a quick snippet, I convert that list into a pipe-delimited list for using with &lt;code&gt;egrep&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Snippets to translate dates using natural language (thanks to &lt;a href="http://brettterpstra.com/2011/10/15/natural-language-dates-for-textexpander/"&gt;Brett Terpstra&lt;/a&gt; )&lt;/li&gt;
+&lt;li&gt;Snippets for URL shortening (again, more props to &lt;a href="http://brettterpstra.com/2010/10/18/textexpander-bit-ly-with-authentication/"&gt;Brett Terpstra&lt;/a&gt; )&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;HPC On The Road&lt;/h3&gt;
+&lt;p&gt;Saving keystrokes at your computer is a fantastic time-saver.  Saving keystrokes while typing on your iOS device can be a god-send.  Using iOS apps which have TextExpander support and using &lt;a href="https://www.dropbox.com/"&gt;Dropbox&lt;/a&gt; to share your snippets between your computers and devices, you can save a ton of time.   This can be used both for user support as well as logging into the cluster (using apps like &lt;a href="https://itunes.apple.com/app/issh-ssh-vnc-console/id287765826?mt=8"&gt;iSSH&lt;/a&gt; ).&lt;/p&gt;
+&lt;p&gt;If you haven't played with it, I can't recommend enough downloading a trial from Smile and putting it through its paces.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Matthew Britt</dc:creator><pubDate>Thu, 30 May 2013 00:00:00 -0400</pubDate><guid>tag:msbritt.github.io,2013-05-30:blog/2013/05/30/using-textexpander-for-hpc/</guid><category>HPC</category><category>Textexpander</category></item></channel></rss>
